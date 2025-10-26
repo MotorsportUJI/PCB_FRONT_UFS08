@@ -27,6 +27,7 @@ void task_data_collector(void *pvParams) {
     }
     while (xQueueReceive(presion_freno_queue, &pres_freno, 0) == pdTRUE) {
       temp_data.pres_freno = pres_freno;
+      can.sendPressureBreak(pres_freno);
     }
     while (xQueueReceive(hall_queue, &hall_rpm, 0) == pdTRUE) {
       temp_data.hall_rear_right = hall_rpm;
