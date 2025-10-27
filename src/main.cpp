@@ -11,8 +11,9 @@
 QueueHandle_t galgas_queue = nullptr;
 QueueHandle_t presion_freno_queue = nullptr;
 QueueHandle_t hall_queue = nullptr;
-SemaphoreHandle_t data_mutex = nullptr;
-Data actual_data = {};
+QueueHandle_t sd_logger_queue = nullptr;
+QueueHandle_t telemetry_queue = nullptr;
+QueueHandle_t screen_queue = nullptr;
 
 AnalogSensor presion_freno(PIN_PRESION_FRENO, 12, 410, 3685, 0, 104);
 
@@ -52,10 +53,9 @@ void setup() {
   galgas_queue = xQueueCreate(QUEUE_GALGAS_LENGTH, sizeof(int)*6);          // Cola para 10 lecturas de galgas
   presion_freno_queue = xQueueCreate(QUEUE_PRESION_LENGTH, sizeof(int));    // Cola para 10 lecturas de presión de freno
   hall_queue = xQueueCreate(QUEUE_HALL_LENGTH, sizeof(int));              // Cola para 10 lecturas de RPM del Hall
-
-  data_mutex = xSemaphoreCreateMutex();
-
-  actual_data = {};
+  sd_logger_queue = xQueueCreate(QUEUE_SD_LOGGER_LENGTH, sizeof(Data));    // Cola para 50 datos a registrar en SD
+  telemetry_queue = xQueueCreate(QUEUE_TELEMETRY_LENGTH, sizeof(Data));        // Cola para 50 datos a enviar por telemetría
+  screen_queue = xQueueCreate(QUEUE_SCREEN_LENGTH, sizeof(Data));          // Cola para 10 datos a mostrar en pantalla
 
   xTaskCreate(task_galgas, "Galgas", STACK_GALGAS, NULL, PRIO_GALGAS, NULL);           // Tarea de lectura del sensor de galgas
   xTaskCreate(task_presion_freno, "PresionFreno", STACK_PRESION, NULL, PRIO_PRESION, NULL); // Tarea de lectura del sensor de presión de freno

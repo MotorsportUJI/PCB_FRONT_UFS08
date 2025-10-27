@@ -17,7 +17,7 @@ void task_galgas(void *pvParams) {
     galgas[5] = galga_din3_left.readRaw();
 
 
-    xQueueSend(galgas_queue, galgas, portMAX_DELAY);
+    xQueueOverwrite(galgas_queue, galgas);
 
     vTaskDelay(pdMS_TO_TICKS(PERIOD_GALGAS_MS));
   }
@@ -26,7 +26,7 @@ void task_galgas(void *pvParams) {
 void task_presion_freno(void *pvParams) {
   for (;;) {
     int pres_freno = presion_freno.read();
-    xQueueSend(presion_freno_queue, &pres_freno, portMAX_DELAY);
+    xQueueOverwrite(presion_freno_queue, &pres_freno);
     vTaskDelay(pdMS_TO_TICKS(PERIOD_PRESION_MS));
   }
 }

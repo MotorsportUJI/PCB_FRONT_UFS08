@@ -28,9 +28,12 @@
 #define STACK_SD_LOGGER    4096
 
 // Longitudes de colas
-#define QUEUE_GALGAS_LENGTH    10
-#define QUEUE_PRESION_LENGTH   10
-#define QUEUE_HALL_LENGTH      10
+#define QUEUE_GALGAS_LENGTH    1
+#define QUEUE_PRESION_LENGTH   1
+#define QUEUE_HALL_LENGTH      1
+#define QUEUE_SCREEN_LENGTH    1
+#define QUEUE_TELEMETRY_LENGTH 1
+#define QUEUE_SD_LOGGER_LENGTH 20
 
 // Pines de sensores
 #define PIN_HALL_SENSOR        40

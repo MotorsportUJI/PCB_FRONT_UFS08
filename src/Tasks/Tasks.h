@@ -44,15 +44,14 @@ struct Data {
 extern QueueHandle_t galgas_queue;
 extern QueueHandle_t presion_freno_queue;
 extern QueueHandle_t hall_queue;
-
-extern SemaphoreHandle_t data_mutex;
-extern Data actual_data;
+extern QueueHandle_t sd_logger_queue;
+extern QueueHandle_t telemetry_queue;
+extern QueueHandle_t screen_queue;
 
 // ===== Declaraciones de tareas =====
 void task_galgas(void *pvParams);
 void task_presion_freno(void *pvParams);
 void task_hall(void *pvParams);
-void task_data_collector(void *pvParams);
 void task_data_collector(void *pvParams);
 void task_screen(void *pvParams);
 void task_telemetry(void *pvParams);

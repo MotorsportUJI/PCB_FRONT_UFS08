@@ -11,11 +11,8 @@ void task_data_collector(void *pvParams) {
   int hall_rpm;
   TickType_t lastWake = xTaskGetTickCount();
 
+  Data temp_data = {};
   for (;;) {
-
-    xSemaphoreTake(data_mutex, portMAX_DELAY);
-      Data temp_data = actual_data;
-    xSemaphoreGive(data_mutex);
 
     while (xQueueReceive(galgas_queue, galgas, 0) == pdTRUE) {
       temp_data.gal_din1_rightf = galgas[0];
@@ -81,9 +78,9 @@ void task_data_collector(void *pvParams) {
     temp_data.gyro_y = inertial.gyroY;
     temp_data.gyro_z = inertial.gyroZ;
 
-    xSemaphoreTake(data_mutex, portMAX_DELAY);
-    actual_data = temp_data;
-    xSemaphoreGive(data_mutex);
+    xQueueSend(sd_logger_queue, &temp_data, 0);
+    xQueueOverwrite(telemetry_queue, &temp_data);
+    xQueueOverwrite(screen_queue, &temp_data);
 
     vTaskDelayUntil(&lastWake, pdMS_TO_TICKS(PERIOD_DATACOLLECT_MS));
   }
