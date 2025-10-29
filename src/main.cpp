@@ -33,8 +33,9 @@ CANread can(CAN_BUS_BAUDRATE);
 
 void setup() {
   Serial.begin(9600);
-  delay(100);
-
+  delay(10000);
+  
+  Serial.println("Iniciando sistema...");
   // Inicialización de sensores
   presion_freno.begin();
 
@@ -47,6 +48,11 @@ void setup() {
 
   hallSensor.begin();
 
+  // Inicializar puerto serie usado por la pantalla (Nextion) si existe
+  // Usamos 9600 como baud por defecto (ajustar si tu display usa otro).
+  Serial.println("Inicializando Serial8 para pantalla...");
+  Serial8.begin(9600);
+
   obd.begin(OBD_CAN_BAUDRATE);
   can.begin();
 
@@ -57,13 +63,23 @@ void setup() {
   telemetry_queue = xQueueCreate(QUEUE_TELEMETRY_LENGTH, sizeof(Data));        // Cola para 50 datos a enviar por telemetría
   screen_queue = xQueueCreate(QUEUE_SCREEN_LENGTH, sizeof(Data));          // Cola para 10 datos a mostrar en pantalla
 
-  xTaskCreate(task_galgas, "Galgas", STACK_GALGAS, NULL, PRIO_GALGAS, NULL);           // Tarea de lectura del sensor de galgas
-  xTaskCreate(task_presion_freno, "PresionFreno", STACK_PRESION, NULL, PRIO_PRESION, NULL); // Tarea de lectura del sensor de presión de freno
-  xTaskCreate(task_hall, "Hall", STACK_HALL, NULL, PRIO_HALL, NULL);                     // Tarea de lectura del sensor Hall
-  xTaskCreate(task_data_collector, "DataCollector", STACK_DATACOLLECT, NULL, PRIO_DATACOLLECT, NULL); // Tarea de recopilación de datos
-  xTaskCreate(task_screen, "Screen", STACK_SCREEN, NULL, PRIO_SCREEN, NULL);               // Tarea de actualización de la pantalla
-  xTaskCreate(task_telemetry, "Telemetry", STACK_TELEMETRY, NULL, PRIO_TELEMETRY, NULL);           // Tarea de telemetría
-  xTaskCreate(task_sd_logger, "SDLogger", STACK_SD_LOGGER, &sdLogger, PRIO_SD_LOGGER, NULL);           // Tarea de registro en SD
+  Serial.println("Creando tareas...");
+  TaskHandle_t hGalgas = NULL, hPresion = NULL, hHall = NULL, hDataCollector = NULL, hScreen = NULL, hTelemetry = NULL, hSDLogger = NULL;
+  BaseType_t r;
+  r = xTaskCreate(task_galgas, "Galgas", STACK_GALGAS, NULL, PRIO_GALGAS, &hGalgas);           // Tarea de lectura del sensor de galgas
+  Serial.printf("create Galgas: %d\n", (int)r);
+  r = xTaskCreate(task_presion_freno, "PresionFreno", STACK_PRESION, NULL, PRIO_PRESION, &hPresion); // Tarea de lectura del sensor de presión de freno
+  Serial.printf("create PresionFreno: %d\n", (int)r);
+  r = xTaskCreate(task_hall, "Hall", STACK_HALL, NULL, PRIO_HALL, &hHall);                     // Tarea de lectura del sensor Hall
+  Serial.printf("create Hall: %d\n", (int)r);
+  r = xTaskCreate(task_data_collector, "DataCollector", STACK_DATACOLLECT, NULL, PRIO_DATACOLLECT, &hDataCollector); // Tarea de recopilación de datos
+  Serial.printf("create DataCollector: %d\n", (int)r);
+  r = xTaskCreate(task_screen, "Screen", STACK_SCREEN, NULL, PRIO_SCREEN, &hScreen);               // Tarea de actualización de la pantalla
+  Serial.printf("create Screen: %d\n", (int)r);
+  r = xTaskCreate(task_telemetry, "Telemetry", STACK_TELEMETRY, NULL, PRIO_TELEMETRY, &hTelemetry);           // Tarea de telemetría
+  Serial.printf("create Telemetry: %d\n", (int)r);
+  r = xTaskCreate(task_sd_logger, "SDLogger", STACK_SD_LOGGER, &sdLogger, PRIO_SD_LOGGER, &hSDLogger);           // Tarea de registro en SD
+  Serial.printf("create SDLogger: %d\n", (int)r);
 
   vTaskStartScheduler(); // Inicia el planificador de FreeRTOS
 }

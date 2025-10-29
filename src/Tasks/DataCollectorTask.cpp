@@ -78,10 +78,25 @@ void task_data_collector(void *pvParams) {
     temp_data.gyro_y = inertial.gyroY;
     temp_data.gyro_z = inertial.gyroZ;
 
-    xQueueSend(sd_logger_queue, &temp_data, 0);
-    xQueueOverwrite(telemetry_queue, &temp_data);
-    xQueueOverwrite(screen_queue, &temp_data);
+  Serial.println("Datos recopilados:");
+  Serial.printf("RPM: %d\n", temp_data.obd_rpm);
+  Serial.printf("Throttle: %d\n", temp_data.obd_throttle);
+  Serial.printf("Coolant Temp: %d\n", temp_data.obd_temp);
+  Serial.printf("Presion Freno: %d\n", temp_data.pres_freno);
+  Serial.printf("Hall RPM: %d\n", temp_data.hall_rear_right);
 
-    vTaskDelayUntil(&lastWake, pdMS_TO_TICKS(PERIOD_DATACOLLECT_MS));
+  xQueueSend(sd_logger_queue, &temp_data, 0);
+  xQueueOverwrite(telemetry_queue, &temp_data);
+
+  // Diagnóstico: mostrar conteo de mensajes en la cola pantalla antes y después
+  UBaseType_t before = uxQueueMessagesWaiting(screen_queue);
+  Serial.printf("Antes de escribir screen_queue (mensajes esperando): %u\n", (unsigned)before);
+
+  xQueueOverwrite(screen_queue, &temp_data);
+
+  UBaseType_t after = uxQueueMessagesWaiting(screen_queue);
+  Serial.printf("Despues de escribir screen_queue (mensajes esperando): %u\n", (unsigned)after);
+
+    vTaskDelay(pdMS_TO_TICKS(PERIOD_DATACOLLECT_MS));
   }
 }

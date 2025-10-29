@@ -1,12 +1,12 @@
 #pragma once
 
 // Prioridades (mayor = más urgente)
-#define PRIO_GALGAS        1
-#define PRIO_PRESION       3
-#define PRIO_HALL          1
-#define PRIO_DATACOLLECT   4
+#define PRIO_GALGAS        2
+#define PRIO_PRESION       2
+#define PRIO_HALL          2
+#define PRIO_DATACOLLECT   2
 #define PRIO_SCREEN        2
-#define PRIO_TELEMETRY     1
+#define PRIO_TELEMETRY     2
 #define PRIO_SD_LOGGER     2
 
 // Periodos (ms)
